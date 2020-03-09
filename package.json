@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ClayData/employee-tracker#readme",
   "dependencies": {
-    "inquirer": "^7.0.6"
+    "inquirer": "^7.0.6",
+    "mysql": "^2.18.1"
   }
 }
