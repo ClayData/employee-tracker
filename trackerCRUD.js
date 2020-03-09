@@ -167,7 +167,11 @@ function updateRole() {
 
 function viewEmployees() {
     console.log("Displaying employees.., \n")
-    connection.query("SELECT * FROM employee", function(err, res) {
+    connection.query(`SELECT e.id, CONCAT(e.first_name, " ", e.last_name) AS 'Name', CONCAT(m.first_name, " ", m.last_name) AS 'Manager', role.title, role.salary, department.name
+    FROM employee e
+    INNER JOIN employee m ON e.manager_id = m.id
+    LEFT JOIN role ON e.role_id = role.id 
+    LEFT JOIN department ON department.id = role.department_id;`, function(err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.table(res);
@@ -192,3 +196,10 @@ function viewRoles() {
         start();
     });
 };
+
+// function viewEbyM() {
+//     inquirer.prompt({
+        
+//     })
+//     connection.query(`SELECT * FROM employee WHERE manager_id = ${}`)
+// }
