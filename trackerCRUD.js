@@ -38,6 +38,7 @@ function start() {
         "Add a Department",
         "Add a Role",
         "Update Employee roles",
+        "View Employees by Manager",
         "Exit"
     ]
     }).then(function(answer){
@@ -66,11 +67,21 @@ function start() {
             case "Exit":
                 connection.end;
                 break;
+            case "View Employees by Manager":
+                viewEbyM();
+                break;
         };
     });
 };
 
 function addEmployee() {
+    connection.query(`SELECT CONCAT(m.first_name, " ", m.last_name) AS 'Manager', m.id
+    FROM employee e
+    INNER JOIN employee m ON e.manager_id = m.id
+    ORDER BY Manager;`, function(err, res){ 
+        if (err) throw err;
+        console.table(res);
+        
     inquirer.prompt([{
       name:"first",
       type:"input",
@@ -84,12 +95,12 @@ function addEmployee() {
       {
         name:"role",
         type:"input",
-        message:"What is employees role"  
+        message:"What is the id of the employees role"  
       },
       {
         name:"manager",
         type:"input",
-        message:"Who is the employees manager"  
+        message:"What is the employees managers id"  
       },
     ]).then(function(answer){connection.query("INSERT INTO employee SET ?", 
 {   
@@ -103,6 +114,7 @@ function addEmployee() {
         start();
     })
   })
+}) 
 }
 
 function addDepartment() {
@@ -118,11 +130,16 @@ function addDepartment() {
 })
 }
 
+
 function addRole() {
+    connection.query("SELECT name, id FROM department", function(err, res){ 
+    if (err) throw err;
+  
+    console.table(res)
     inquirer.prompt([{
       name:"title",
       type:"input",
-      message:"What is roles title?"  
+      message:"What is the roles title?"  
     },
     {
         name:"salary",
@@ -132,22 +149,24 @@ function addRole() {
       {
         name:"department",
         type:"input",
-        message:"What is the department id?"  
+        message:"What is the id of the department"
       }
     ]).then(function(answer){connection.query("INSERT INTO role SET ?", 
 {   
-    first_name: answer.title,
-    last_name: answer.salary, 
-    role_id: answer.department,
+    title: answer.title,
+    salary: answer.salary, 
+    department_id: answer.department,
 },
      function(err, res) {
         if (err) throw err;
         start();
     })
   })
+})
 }
 
 function updateRole() {
+    viewEmployees();
     inquirer.prompt([{
         name:"employee",
         type:"input",
@@ -197,9 +216,15 @@ function viewRoles() {
     });
 };
 
-// function viewEbyM() {
-//     inquirer.prompt({
-        
-//     })
-//     connection.query(`SELECT * FROM employee WHERE manager_id = ${}`)
-// }
+function viewEbyM() {
+    connection.query(`SELECT CONCAT(e.first_name, " ", e.last_name) AS 'Name', CONCAT(m.first_name, " ", m.last_name) AS 'Manager'
+    FROM employee e
+    INNER JOIN employee m ON e.manager_id = m.id
+    ORDER BY Manager;
+    `, function(err, res){
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.table(res);
+        start();
+    })
+};
