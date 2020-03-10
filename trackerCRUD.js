@@ -81,7 +81,7 @@ function addEmployee() {
     ORDER BY Manager;`, function(err, res){ 
         if (err) throw err;
         console.table(res);
-        
+
     inquirer.prompt([{
       name:"first",
       type:"input",
@@ -228,3 +228,24 @@ function viewEbyM() {
         start();
     })
 };
+
+function deleteRow(){
+    inquirer.prompt([{
+        name:"choice",
+        type:"list",
+        message:"From which table would you like to delete?",
+        choices:["employee", "role", "department"]
+    },
+    {
+        name:"id",
+        type:"input",
+        message:"What is the id of the row you would like to delete?"
+    }
+]).then(function(answer){
+    connectionl.query(`DELETE FROM ${answer.choice} WHERE id = ${answer.id}`,function(err, res) {
+        if (err) throw err;
+
+        start();
+    });
+})
+}
