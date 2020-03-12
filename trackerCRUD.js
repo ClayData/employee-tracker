@@ -39,6 +39,7 @@ function start() {
         "Add a Role",
         "Update Employee roles",
         "View Employees by Manager",
+        "Delete a row",
         "Exit"
     ]
     }).then(function(answer){
@@ -64,11 +65,17 @@ function start() {
             case "Update Employee roles":
                 updateRole();
                 break;    
-            case "Exit":
-                connection.end;
+            case "Delete a row":
+                deleteRow();
                 break;
             case "View Employees by Manager":
                 viewEbyM();
+                break;
+            case "View Department Budget":
+                utilizedBudget();
+                break;
+            case "Exit":
+                connection.end;
                 break;
         };
     });
@@ -242,10 +249,23 @@ function deleteRow(){
         message:"What is the id of the row you would like to delete?"
     }
 ]).then(function(answer){
-    connectionl.query(`DELETE FROM ${answer.choice} WHERE id = ${answer.id}`,function(err, res) {
+    connection.query(`DELETE FROM ${answer.choice} WHERE id = ${answer.id}`,function(err, res) {
         if (err) throw err;
 
         start();
     });
 })
+}
+
+function utilizedBudget(){
+    connection.query(`SELECT  department.name ,SUM(role.salary) AS 'department_cost'
+    FROM employee e
+    INNER JOIN employee m ON e.manager_id = m.id
+    LEFT JOIN role ON e.role_id = role.id 
+    LEFT JOIN department ON department.id = role.department_id
+    GROUP BY department.name;`, function(err, res) {
+        if(err) throw err;
+        console.table(res);
+        start();
+    })
 }
